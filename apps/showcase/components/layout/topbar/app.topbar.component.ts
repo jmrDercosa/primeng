@@ -93,7 +93,7 @@ import { StyleClass } from 'primeng/styleclass';
             </div>
 
             <ul class="topbar-items">
-                <li *ngIf="false">
+                <li>
                     <div id="docsearch"></div>
                 </li>
                 <li>
@@ -177,7 +177,7 @@ export class AppTopBarComponent implements OnDestroy {
 
         afterNextRender(() => {
             this.bindScrollListener();
-            // this.initDocSearch();
+            this.initDocSearch();
         });
     }
 
