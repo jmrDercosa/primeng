@@ -150,6 +150,8 @@ export class DynamicDialogComponent extends BaseComponent implements AfterViewIn
 
     childComponentType: Nullable<Type<any>>;
 
+    inputValues: Record<string, any>;
+
     container: Nullable<HTMLDivElement>;
 
     wrapper: Nullable<HTMLElement>;
@@ -342,6 +344,13 @@ export class DynamicDialogComponent extends BaseComponent implements AfterViewIn
         viewContainerRef?.clear();
 
         this.componentRef = viewContainerRef?.createComponent(componentType);
+        
+        if (this.inputValues) {
+            Object.entries(this.inputValues).forEach(([key, value]) => {
+                this.componentRef.setInput(key, value);
+            });
+        }
+        
         this.dialogRef.onChildComponentLoaded.next(this.componentRef!.instance);
     }
 
