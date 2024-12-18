@@ -1,6 +1,6 @@
 import { animate, animation, AnimationEvent, style, transition, trigger, useAnimation } from '@angular/animations';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { AfterViewInit, ChangeDetectionStrategy, Component, ComponentRef, ElementRef, inject, NgModule, NgZone, OnDestroy, Optional, Renderer2, SkipSelf, Type, ViewChild, ViewEncapsulation, ViewRef } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ComponentRef, ElementRef, inject, NgModule, NgZone, OnDestroy, Optional, Renderer2, SkipSelf, TemplateRef, Type, ViewChild, ViewEncapsulation, ViewRef } from '@angular/core';
 import { addClass, getOuterHeight, getOuterWidth, getViewport, hasClass, removeClass, setAttribute, uuid } from '@primeuix/utils';
 import { SharedModule, TranslationKeys } from 'primeng/api';
 import { BaseComponent } from 'primeng/basecomponent';
@@ -63,6 +63,7 @@ const hideAnimation = animation([animate('{{transition}}', style({ transform: '{
                 [style.height]="ddconfig.height"
                 [attr.aria-labelledby]="ariaLabelledBy"
                 [attr.aria-modal]="true"
+                [attr.id]="dialogId"
             >
                 <div *ngIf="ddconfig.resizable" [ngClass]="'p-resizable-handle'" style="z-index: 90;" (mousedown)="initResize($event)"></div>
                 <div #titlebar [ngClass]="'p-dialog-header'" (mousedown)="initDrag($event)" *ngIf="ddconfig.showHeader !== false">
@@ -76,10 +77,10 @@ const hideAnimation = animation([animate('{{transition}}', style({ transform: '{
                                     <WindowMinimizeIcon *ngIf="maximized && !minimizeIconTemplate" />
                                 </ng-container>
                                 <ng-container *ngIf="!maximized">
-                                    <ng-template *ngTemplateOutlet="_maximizeIconTemplate"></ng-template>
+                                    <ng-template *ngTemplateOutlet="maximizeIconTemplate"></ng-template>
                                 </ng-container>
                                 <ng-container *ngIf="maximized">
-                                    <ng-template *ngTemplateOutlet="_minimizeIconTemplate"></ng-template>
+                                    <ng-template *ngTemplateOutlet="minimizeIconTemplate"></ng-template>
                                 </ng-container>
                             </p-button>
                             <p-button *ngIf="closable" [styleClass]="'p-dialog-close-button'" [ariaLabel]="closeAriaLabel" (onClick)="hide()" (keydown.enter)="hide()" rounded text severity="secondary">
@@ -260,11 +261,11 @@ export class DynamicDialogComponent extends BaseComponent implements AfterViewIn
         return this.ddconfig?.templates?.content;
     }
 
-    get minimizeIconTemplate() {
+    get minimizeIconTemplate(): any {
         return this.ddconfig?.templates?.minimizeicon;
     }
 
-    get maximizeIconTemplate() {
+    get maximizeIconTemplate(): any {
         return this.ddconfig?.templates?.maximizeicon;
     }
 
@@ -283,6 +284,10 @@ export class DynamicDialogComponent extends BaseComponent implements AfterViewIn
         };
     }
 
+    get dialogId() {
+        return this.attrSelector;
+    }
+
     constructor(
         public renderer: Renderer2,
         public ddconfig: DynamicDialogConfig,
@@ -299,6 +304,7 @@ export class DynamicDialogComponent extends BaseComponent implements AfterViewIn
             this.createStyle();
         }
     }
+
     createStyle() {
         if (isPlatformBrowser(this.platformId)) {
             if (!this.styleElement) {
@@ -309,7 +315,7 @@ export class DynamicDialogComponent extends BaseComponent implements AfterViewIn
                 for (let breakpoint in this.breakpoints) {
                     innerHTML += `
                         @media screen and (max-width: ${breakpoint}) {
-                            .p-dialog[${this.attrSelector}]:not(.p-dialog-maximized) {
+                            .p-dialog[id=${this.dialogId}]:not(.p-dialog-maximized) {
                                 width: ${this.breakpoints[breakpoint]} !important;
                             }
                         }
